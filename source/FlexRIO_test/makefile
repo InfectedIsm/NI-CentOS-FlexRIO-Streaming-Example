@@ -12,10 +12,12 @@ EXE=flexrio_test
 # $@ >> variable for target	,	$^ >> variable for dependencies
 # $(..) >> .. = variable name
 
+all:$(EXE)
+
 #executable
 $(EXE) : NiFpga.o NiFpga_IF_5764_FPGA.o getstarted.o flexrio_test.o      
 	$(CC) -o $@ $^ $(LDFLAGS)
-	make clean
+	make rebuild
 
 #sources
 flexrio_test.o : flexrio_test.c 
@@ -33,3 +35,6 @@ NiFpga.o: NiFpga.c
 #cleaning
 clean:
 	rm -f *.o $(EXE)
+
+rebuild:
+	rm -f *.o

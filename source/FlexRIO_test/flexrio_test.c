@@ -5,7 +5,7 @@
 #include "NiFpga_IF_5764_FPGA.h"
 #include "NiFpga.h"
 
-char 	*ressourceName = "NI-5674";
+char 	*ressourceName = "RIO1";
 char 	*bitfileName = "Bitfile.lvbitx";
 int32_t openSessFlags = 0;
 
@@ -29,13 +29,20 @@ int main()
     // FlexRIO Configuration
     uint32_t trig_instance = 0;
 
-	niFlexRIO_OpenSession	(ressourceName, bitfileName, openSessFlags, 
-						&sess);
-	niFlexRIO_WaitForIoReady(sess, timeout, &ioReadyFlag,
-                    	&ioError);
-	niFlexRIO_ConfigureForReferenceClock(sess, kFlexRIO_RefClkSrc_PXI_Clk10);
-    niFlexRIO_ConfigureImmediateTrigger(sess, trig_instance);
-    niFlexRIO_Commit(sess);
+	NiFpga_MergeStatus(&status, 
+        niFlexRIO_OpenSession	(ressourceName, bitfileName, openSessFlags,	&sess));
+
+	NiFpga_MergeStatus(&status, 
+        niFlexRIO_WaitForIoReady(sess, timeout, &ioReadyFlag, &ioError));
+
+	NiFpga_MergeStatus(&status, 
+        niFlexRIO_ConfigureForReferenceClock(sess, kFlexRIO_RefClkSrc_PXI_Clk10));
+
+    NiFpga_MergeStatus(&status, 
+        niFlexRIO_ConfigureImmediateTrigger(sess, trig_instance));
+    
+    NiFpga_MergeStatus(&status, 
+        niFlexRIO_Commit(sess));
 
     // Acquisition parameters configuration
     int outsideNyquist;
@@ -48,12 +55,10 @@ int main()
     }
 
     //writing to FPGA
-    NiFpga_MergeStatus(&status, NiFpga_WriteU64(sess,
-                                                NiFpga_IF_5764_FPGA_ControlFxp_frequencyshift_Resource,
-                                                actualCenterFreq/500e6));       //scaled for Flex
-    NiFpga_MergeStatus(&status, NiFpga_WriteU64(sess,
-                                                NiFpga_IF_5764_FPGA_ControlFxp_outputsamplerate_Resource,
-                                                actualIQrate/1e9));             //scaled for Flex
+    NiFpga_MergeStatus(&status, 
+        NiFpga_WriteU64(sess,NiFpga_IF_5764_FPGA_ControlFxp_frequencyshift_Resource, actualCenterFreq/500e6));       //scaled for Flex
+    NiFpga_MergeStatus(&status, 
+        NiFpga_WriteU64(sess, NiFpga_IF_5764_FPGA_ControlFxp_outputsamplerate_Resource, actualIQrate/1e9));             //scaled for Flex
     
     getStarted_CreateFile();//--------------------------------------------//TO DEVELOP
 
@@ -64,6 +69,12 @@ int main()
     getStarted_ClearStream();//--------------------------------------------//TO DEVELOP                
     getStarted_StartStream();//--------------------------------------------//TO DEVELOP
 
+    if (NiFpga_IsError(status))
+            {
+                char error[32];
+                sprintf(error, "Error %d!", status);
+                fprintf(stderr, "%s\n", error);
+            }
 
     //fetch and write threads creation
     if (pthread_create(&th1, NULL, getStarted_AcquireAndWriteThread, "AI1_AI2") < 0 ){
