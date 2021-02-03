@@ -1,0 +1,17 @@
+#Build executable
+all : getstarted
+
+getstarted: getstarted.o
+	gcc -o getstarted getstarted.o
+
+getstarted.o: getstarted.c
+	gcc -Wall -L/usr/lib/x86_64-linux-gnu/ -lniflexrioapi -lpthread -c getstarted.c 
+
+clean:
+	rm -f *.o getstarted
+
+#Run executable
+
+.PHONY: run-test
+run-test:
+	./getstarted
