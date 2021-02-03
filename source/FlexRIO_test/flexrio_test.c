@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <niflexrioapi.h>
 #include <pthread.h>
-#include "getstarted.c" //change to .h
+#include "getstarted.h" //change to .h
 #include "NiFpga_IF_5764_FPGA.h"
 #include "NiFpga.h"
 

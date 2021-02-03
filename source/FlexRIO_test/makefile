@@ -1,31 +1,35 @@
 #variables
 CC=gcc
-CFLAGS=-O2 -Wall
-LDFLAGS=-O2 -L/usr/lib/x86_64-linux-gnu/ -lniflexrioapi -lniriosession -lpthread
+CFLAGS=-O2 -Wall -c
+LDFLAGS=-O2 -L/usr/lib/x86_64-linux-gnu/ -lniflexrioapi -lNiFpga -lpthread -ldl
+
+EXE=flexrio_test
+
+#syntax :
+# TARGET : DEPEDENCIES
+#	COMMANDS
+#
+# $@ >> variable for target	,	$^ >> variable for dependencies
+# $(..) >> .. = variable name
 
 #executable
-# flexrio_test.o getstarted.o NiFpga_IF_5764_FPGA.o NiFpga.o
-flexrio_test : NiFpga.o NiFpga_IF_5764_FPGA.o getstarted.o flexrio_test.o      
-	$(CC) -o flexrio_test NiFpga.o NiFpga_IF_5764_FPGA.o getstarted.o flexrio_test.o  
-
+$(EXE) : NiFpga.o NiFpga_IF_5764_FPGA.o getstarted.o flexrio_test.o      
+	$(CC) -o $@ $^ $(LDFLAGS)
+	make clean
 
 #sources
-
-flexrio_test.o : flexrio_test.c
-	$(CC) $(CFLAGS) $(LDFLAGS) flexrio_test.c 
+flexrio_test.o : flexrio_test.c 
+	$(CC) $(CFLAGS) $^
 
 getstarted.o: getstarted.c
-	$(CC) $(CFLAGS) getstarted.c 
+	$(CC) $(CFLAGS) $^
 
-NiFpga_IF_5764_FPGA.o: NiFpga_IF_5764_FPGA.c
-	$(CC) $(CFLAGS) NiFpga_IF_5764_FPGA.c 	
+NiFpga_IF_5764_FPGA.o: NiFpga_IF_5764_FPGA.c 
+	$(CC) $(CFLAGS) $^	
 
 NiFpga.o: NiFpga.c
-	$(CC) $(CFLAGS) NiFpga.c 
-
-
-
+	$(CC) $(CFLAGS) $^
 
 #cleaning
 clean:
-	rm -f *.o flexrio_test
+	rm -f *.o $(EXE)

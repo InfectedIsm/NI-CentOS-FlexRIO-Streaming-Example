@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include "getstarted.h"
 
 
 //DONE
