@@ -6,7 +6,7 @@
 #include "NiFpga.h"
 
 char 	*ressourceName = "RIO1";
-char 	*bitfileName = "Bitfile.lvbitx";
+char 	*bitfileName = "IF_5764_FPGA.lvbitx";
 int32_t openSessFlags = 0;
 
 
